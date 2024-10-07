@@ -1,0 +1,33 @@
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: banksite_jest
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - "3306:3306"  # Om du har ändrat porten
+    volumes:
+      - mysql_data:/var/lib/mysql  # Persistenta datan
+    restart: always  # Starta om containern automatiskt vid fel
+
+  express:
+    build:
+      context: ./backend
+    ports:
+      - "3002:3001"  # Exponerar backend på port 3001
+    depends_on:
+      - mysql
+    restart: always  # Starta om containern automatiskt vid fel
+
+  nextjs:
+    build:
+      context: ./frontend
+    ports:
+      - "3001:3000"  # Exponerar frontend på port 3001
+    depends_on:
+      - express
+    restart: always  # Starta om containern automatiskt vid fel
+
+volumes:
+  mysql_data:  # Definiera volymen för MySQL
